@@ -15,14 +15,16 @@ if [ -z "${DEPLOYMENT_DOC_INDEX}" ]; then
 fi
 DEPLOY_FILE="deploy.yml"
 yq read --doc $DEPLOYMENT_DOC_INDEX $DEPLOYMENT_FILE > "${DEPLOY_FILE}"
-
+echo "DEPLOYMENT_FILE ${DEPLOYMENT_FILE}"
+echo "DEPLOY_FILE ${DEPLOY_FILE}"
 # Update deployment with image name
 cp $DEPLOY_FILE "${DEPLOY_FILE}.bak"
 cat "${DEPLOY_FILE}.bak" \
-  | yq write - "spec.template.spec.containers[0].image" "${ZAP_API_IMAGE}" \
   | yq write - "metadata.name" "${DEPLOYMENT_NAME}" \
+  | yq write - "spec.template.spec.containers[0].image" "${ZAP_API_IMAGE}" \
   > "${DEPLOY_FILE}"
 #rm "${DEPLOY_FILE}.bak"
 cat "${DEPLOY_FILE}"
 DEPLOYMENT_FILE="${DEPLOY_FILE}" # use modified file
+echo "DEPLOYMENT_FILE ${DEPLOYMENT_FILE}"
 cat "${DEPLOYMENT_FILE}"
