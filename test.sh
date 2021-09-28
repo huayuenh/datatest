@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DEPLOYMENT_FILE=./deployment.YAML
+DEPLOYMENT_FILE=./deployment.yaml
 
 ZAP_API_IMAGE="my-image"
 DEPLOYMENT_NAME="my-deployment-name"
@@ -15,16 +15,14 @@ if [ -z "${DEPLOYMENT_DOC_INDEX}" ]; then
 fi
 DEPLOY_FILE="deploy.yml"
 yq read --doc $DEPLOYMENT_DOC_INDEX $DEPLOYMENT_FILE > "${DEPLOY_FILE}"
-# Update deployment with image name
 
+# Update deployment with image name
 cp $DEPLOY_FILE "${DEPLOY_FILE}.bak"
 cat "${DEPLOY_FILE}.bak" \
   | yq write - "spec.template.spec.containers[0].image" "${ZAP_API_IMAGE}" \
-  | yq write - "metadata.name" "${DEPLOYMENT_NAME}" 
-  > ${DEPLOY_FILE}
-rm "${DEPLOY_FILE}.bak"
-
-
-yq write "$DEPLOYMENT_FILE" --doc "$DEPLOYMENT_DOC_INDEX" "spec.template.spec.containers[0].image" "${ZAP_API_IMAGE}" > "${NEW_DEPLOYMENT_FILE}"
-DEPLOYMENT_FILE="${NEW_DEPLOYMENT_FILE}" # use modified file
+  | yq write - "metadata.name" "${DEPLOYMENT_NAME}" \
+  > "${DEPLOY_FILE}"
+#rm "${DEPLOY_FILE}.bak"
+cat "${DEPLOY_FILE}"
+DEPLOYMENT_FILE="${DEPLOY_FILE}" # use modified file
 cat "${DEPLOYMENT_FILE}"
