@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ""
+  labels:
+    app: zap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zap
+  template:
+    metadata:
+      labels:
+        app: zap
+    spec:
+      containers:
+      - name: zap-ubi
+        image: ""
+        ports:
+        - containerPort: 9080
