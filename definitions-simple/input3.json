@@ -1,0 +1,899 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"description": "This swagger document describes the options and endpoints of the Tools Integration Broker.",
+		"version": "0.0.1",
+		"title": "IBM OTC Tool Integration Broker API"
+	},
+	"host": "otc-toolint-broker.mon01.devops.cloud.ibm.com",
+	"basePath": "/toolint-broker/api/v1",
+	"tags": [{
+			"name": "catalog",
+			"description": "Endpoints for registering a broker."
+		},
+		{
+			"name": "service_instances",
+			"description": "Endpoints for fetching information about a service instance."
+		},
+		{
+			"name": "passwords",
+			"description": "Endpoints for fetching information about a service instance."
+		},
+		{
+			"name": "messaging",
+			"description": "Endpoints for message/event notification."
+		},
+		{
+            "name":"services",
+            "description":"Endpoints for fetching information on services from registered brokers."
+        },
+		{
+			"name": "monitoring",
+			"description": "Endpoints for monitoring. Note: The base URL for these endpoints are /."
+		}
+	],
+	"schemes": [
+		"https"
+	],
+	"paths": {
+		"/catalog": {
+			"get": {
+				"tags": [
+					"catalog"
+				],
+				"summary": "Describes the service",
+				"description": "Returns the information about the service for broker registration.",
+				"operationId": "getCatalog",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Successful request"
+					},
+					"401": {
+						"description": "Returned when a user is not authenticated with an auth header."
+					},
+					"501": {
+						"description": "Not implemented."
+					}
+				}
+			}
+		},
+		"/service_instances/{sid}": {
+			"get": {
+                "tags": [
+                    "service_instances"
+                ],
+                "summary": "Retrieve a service instance",
+                "description": "Returns information about a service instance.",
+                "operationId": "getServiceInstance",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                    "name": "sid",
+                    "in": "path",
+                    "description": "The API generated unique id of a service instance",
+                    "type": "string",
+                    "required": true
+                }, {
+                    "in": "body",
+                    "name": "body",
+                    "description": "New toolchain details",
+                    "required": false,
+                    "schema": {
+                        "type": "object"
+                    }
+                }, {
+                    "name": "Authorization",
+                    "in": "header",
+                    "description": "Broker Basic Credentials",
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Successful request"
+                    },
+                    "401": {
+                        "description": "Returned when a user is not authenticated with an auth header."
+                    },
+                    "404": {
+						"description": "Returned when the specified service instance doesn't exist"
+					}
+                }
+            },
+			"put": {
+				"tags": [
+					"service_instances"
+				],
+				"summary": "Create or update a service instance",
+				"description": "Returns information about the created or updated service instance. NOTE: Required parameters sent from the otc-api change per service.",
+				"operationId": "setOrUpdateParams",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [{
+						"name": "sid",
+						"in": "path",
+						"description": "The API generated unique id of a service instance",
+						"type": "string",
+						"required": true
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"description": "New toolchain details",
+						"required": false,
+						"schema": {
+							"$ref": "#/definitions/setOrUpdateParams"
+						}
+					},
+					{
+						"name": "Authorization",
+						"in": "header",
+						"description": "Broker Basic Credentials",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful request",
+						"schema": {
+							"$ref": "#/definitions/createOrUpdateServiceInstanceAPIResponse"
+						}
+					},
+					"400": {
+						"description": "Returned when the request parameters are invalid."
+					},
+					"401": {
+						"description": "Returned when a user is not authenticated with an auth header."
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"service_instances"
+				],
+				"summary": "Delete a service instance",
+				"description": "Removes a service instance.",
+				"operationId": "deleteServiceInstance",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [{
+						"name": "sid",
+						"in": "path",
+						"description": "The API generated unique id of a service instance",
+						"type": "string",
+						"required": true
+					},
+					{
+						"name": "Authorization",
+						"in": "header",
+						"description": "Broker Basic Credentials",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Successful request"
+					},
+					"401": {
+						"description": "Returned when a user is not authenticated with an auth header."
+					},
+					"404": {
+						"description": "Returned when a user makes a request to delete something that isn't there."
+					},
+					"500": {
+						"description": "Returned when error occurs while responding to the request."
+					}
+				}
+			},
+			"patch": {
+				"tags": [
+					"service_instances"
+				],
+				"summary": "Patch a service instance",
+				"description": "Returns information about the patched service instance. NOTE required fields defer depending on the service",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [{
+						"name": "sid",
+						"in": "path",
+						"description": "The API generated unique id of a service instance",
+						"type": "string",
+						"required": true
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"description": "Patched service instance details",
+						"required": false,
+						"schema": {
+							"$ref": "#/definitions/setOrUpdateParams"
+						}
+					},
+					{
+						"name": "Authorization",
+						"in": "header",
+						"description": "Broker Basic Credentials",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful request",
+						"schema": {
+							"$ref": "#/definitions/createOrUpdateServiceInstanceAPIResponse"
+						}
+					},
+					"400": {
+						"description": "Returned when the request parameters are invalid."
+					},
+					"401": {
+						"description": "Returned when a user is not authenticated with an auth header."
+					},
+					"404": {
+						"description": "Returned when a user makes a request to delete something that isn't there."
+					}
+				}
+			}
+		},
+		"/service_instances/{sid}/toolchains/{tid}": {
+			"put": {
+				"tags": [
+					"service_instances"
+				],
+				"summary": "Bind a service instance to a toolchain",
+				"description": "Returns information about a service instance.",
+				"operationId": "bindServiceInstanceToToolchain",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [{
+						"name": "sid",
+						"in": "path",
+						"description": "The API generated unique id of a service instance",
+						"type": "string",
+						"required": true
+					},
+					{
+						"name": "tid",
+						"in": "path",
+						"description": "A toolchain id to bind to the service instance",
+						"type": "string",
+						"required": true
+					},
+					{
+						"name": "Authorization",
+						"in": "header",
+						"description": "Broker Basic Credentials",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful request"
+					},
+					"204": {
+						"description": "Successful request with no content"
+					},
+					"400": {
+						"description": "Returned when the request parameters are invalid."
+					},
+					"401": {
+						"description": "Returned when a user is not authenticated with an auth header."
+					},
+					"404": {
+						"description": "Returned when a user makes a request to bind a service instance that does not exist."
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"service_instances"
+				],
+				"summary": "Delete a service instance from a toolchain",
+				"description": "Removes a service instance.",
+				"operationId": "unbindServiceInstanceFromToolchain",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [{
+						"name": "sid",
+						"in": "path",
+						"description": "The API generated unique id of a service instance",
+						"type": "string",
+						"required": true
+					},
+					{
+						"name": "tid",
+						"in": "path",
+						"description": "A toolchain id to unbind from the service instance",
+						"type": "string",
+						"required": true
+					},
+					{
+						"name": "Authorization",
+						"in": "header",
+						"description": "Broker Basic Credentials",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Successful request"
+					},
+					"401": {
+						"description": "Returned when a user is not authenticated with an auth header."
+					}
+				}
+			}
+		},
+		"/version": {
+			"get": {
+				"tags": [
+					"monitoring"
+				],
+				"summary": "Get the build version of the node application",
+				"description": "Returns the build number of the current running node application.",
+				"operationId": "version",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Successful request",
+						"schema": {
+							"$ref": "#/definitions/getVersion"
+						}
+					},
+					"405": {
+						"description": "Returned when the request method is not allowed."
+					}
+				}
+			}
+		},
+		"/status": {
+			"get": {
+				"tags": [
+					"monitoring"
+				],
+				"summary": "Get the status of the Tools Integration Broker node application",
+				"description": "Returns the status of the current running Tools Integration Broker node application.",
+				"operationId": "getStatus",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Tools Integration Broker is running.",
+						"schema": {
+							"$ref": "#/definitions/getStatus"
+						}
+					}
+				}
+			}
+		},
+		"/traceability/{sid}/publish/{tid}": {
+			"post": {
+				"tags": [
+					"messaging"
+				],
+				"summary": "Endpoint that handles traceability payloads delivered by the webhook manager",
+				"description": "Used to handle traceability messages from the webhook manager",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [{
+						"name": "tid",
+						"in": "path",
+						"description": "The ID of the toolchain the traceability message is meant for",
+						"type": "string",
+						"required": true
+					},
+					{
+						"name": "sid",
+						"in": "path",
+						"description": "The ID of the service the traceability message is meant for",
+						"type": "string",
+						"required": true
+					},
+					{
+						"name": "Authorization",
+						"in": "header",
+						"description": "Basic authentication header with a value of TIAM fabric credentials",
+						"type": "string"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"description": "Traceability Payload",
+						"schema": {
+							"$ref": "#/definitions/traceabilityMessaging"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful request"
+					},
+					"202": {
+						"description": "Request accepted, processing synchronously."
+					},
+					"204": {
+						"description": "Successful request with no content."
+					},
+					"400": {
+						"description": "Returned when the request parameters are invalid."
+					},
+					"401": {
+						"description": "Returned when a user is not authenticated with an auth header."
+					},
+					"404": {
+						"description": "Returned when a user makes a request to a service instance that does not exist."
+					},
+					"500": {
+						"description": "Returned when error occurs while responding to the request."
+					}
+				}
+			}
+		},
+		"/messaging/webhook/publish": {
+			"post": {
+				"tags": [
+					"messaging"
+				],
+				"summary": "Endpoint for incoming webhook messages",
+				"description": "Endpoint for incoming notifications from external tools via webhook.",
+				"operationId": "acceptEvent",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [{
+						"in": "body",
+						"name": "body",
+						"description": "Event Payload",
+						"schema": {
+							"$ref": "#/definitions/acceptEvent"
+						}
+					},
+					{
+						"name": "Authorization",
+						"in": "header",
+						"description": "Generated webhook credentials in the form service_id:webhook_secret:webhook_id",
+						"type": "string"
+					},
+					{
+						"name": "x-create-connection",
+						"in": "header",
+						"description": "Field to allow support of multiple message formats. Must be set to true.",
+						"type": "boolean"
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Successful request"
+					},
+					"204": {
+						"description": "Successful request with no content."
+					},
+					"400": {
+						"description": "Returned when a user does not send a recognized message format."
+					},
+					"401": {
+						"description": "Returned when a user is not authenticated with an auth header."
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"messaging"
+				],
+				"summary": "Endpoint for deleting deployable mappings",
+				"description": "Endpoint for deleting deployable mappings that were created in OTC.",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [{
+						"in": "body",
+						"name": "body",
+						"description": "Event Payload",
+						"schema": {
+							"$ref": "#/definitions/deleteMessagingAccept"
+						}
+					},
+					{
+						"name": "Authorization",
+						"in": "header",
+						"description": "Generated webhook credentials in the form service_id:webhook_secret:webhook_id",
+						"type": "string"
+					},
+					{
+						"name": "x-create-connection",
+						"in": "header",
+						"description": "Field to allow support of multiple message formats. Must be set to true.",
+						"type": "boolean"
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Successful request"
+					},
+					"400": {
+						"description": "Returned when a user does not send a recognized message format."
+					},
+					"401": {
+						"description": "Returned when a user is not authenticated with an auth header."
+					}
+				}
+			}
+		},
+		"/password/decrypt/{sid}": {
+			"get": {
+				"tags": [
+					"passwords"
+				],
+				"summary": "Endpoint getting a password associated with the service. This is deprecated. Please use /credentials/decrypt/{sid} instead",
+				"description": "Endpoint getting a password associated with the service. This is deprecated. Please use /credentials/decrypt/{sid} instead",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [{
+						"name": "sid",
+						"in": "path",
+						"description": "The ID of the service that holds the password you want to decrypt",
+						"type": "string",
+						"required": true
+					},
+					{
+						"name": "Authorization",
+						"in": "header",
+						"description": "Basic authentication header with a value of TIAM target credentials scoped to {sid}",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful request"
+					},
+					"401": {
+						"description": "Returned when a user does not pass in a valid auth header."
+					},
+					"404": {
+						"description": "Returned when a user does not pass in a valid service id."
+					}
+				}
+			}
+		},
+		"/credentials/decrypt/{sid}": {
+			"get": {
+				"tags": [
+					"credentials"
+				],
+				"summary": "Endpoint getting the credentials associated with the service.",
+				"description": "Endpoint getting the credentials associated with the service.",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [{
+						"name": "sid",
+						"in": "path",
+						"description": "The ID of the service that holds the credentials",
+						"type": "string",
+						"required": true
+					},
+					{
+						"name": "Authorization",
+						"in": "header",
+						"description": "Basic authentication header with a value of TIAM target credentials scoped to {sid}",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful request"
+					},
+					"401": {
+						"description": "Returned when a user does not pass in a valid auth header."
+					},
+					"404": {
+						"description": "Returned when a user does not pass in a valid service id."
+					}
+				}
+			}
+		},
+		"/form": {
+			"post": {
+				"tags": [
+					"services"
+				],
+				"summary": "Forwards the Authenticate, Populate, and Validate (APV) requests to the appropriate broker",
+				"description": "See https://github.com/open-toolchain/sdk/wiki/Validation for details on how to implement broker side validation.",
+				"parameters": [{
+						"name": "Service ID",
+						"in": "header",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful request"
+					}
+				}
+			}
+		},
+		"/security_compliance/{sid}/toolchains/{tid}/summary": {
+			"get": {
+			  "tags": [
+				"services"
+			  ],
+			  "summary": "Retrieve summary.json file contents from the git repository configured in the security_compliance service instance",
+			  "description": "Returns evidence summary.json file contents from the evidence git repository referenced by the security_compliance service instance",
+			  "parameters": [{
+				  "name": "sid",
+				  "in": "path",
+				  "description": "The API generated unique id of a service instance with service_id: 'security_compliance'",
+				  "type": "string",
+				  "required": true
+				},
+				{
+				  "name": "tid",
+				  "in": "path",
+				  "description": "A toolchain id that the service instance is bound to",
+				  "type": "string",
+				  "required": true
+				}
+			  ],
+			  "responses": {
+				"200": {
+				  "description": "Successful request"
+				},
+				"400": {
+				  "description": "Returned when the request parameters are invalid."
+				},
+				"401": {
+				  "description": "Returned when a user is not authenticated with an auth header."
+				},
+				"404": {
+				  "description": "Returned when a user makes a request to a service instance or a toolchain that does not exist."
+				},
+				"500": {
+				  "description": "Returned when error occurs while responding to the request."
+				}
+			  }
+			}
+		  }
+	},
+	"definitions": {
+		"setOrUpdateParams": {
+			"description": "Body structure for creating or updating a service instance.",
+			"properties": {
+				"parameters": {
+					"description": "JSON data providing the users broker configuration on the otc-ui.",
+					"type": "object",
+					"example": {
+						"name": "Demo Service Name",
+						"dashboard_url": "https://console.ng.bluemix.net"
+					}
+				},
+				"service_id": {
+					"description": "The unique id of the service that an instance is being created from",
+					"type": "string",
+					"example": "jenkins/jira/sonarqube"
+				},
+				"organization_guid": {
+					"description": "The organization the service instance is associated with",
+					"type": "string",
+					"example": "d02d29f1-e7bb-4977-8a6f-26d7b7bb893e"
+				},
+				"service_credentials": {
+					"description": "The service credentials for authenticating with TIAM",
+					"type": "string"
+				}
+			},
+			"required": [
+				"service_id", "organization_guid", "service_credentials", "parameters"
+			]
+		},
+		"createOrUpdateServiceInstanceAPIResponse": {
+			"description": "Body response from creating or updating a service instance.",
+			"properties": {
+				"parameters": {
+					"description": "Parameters send back to the otc-api",
+					"type": "object",
+					"example": {
+						"label": "Demo Service Name"
+					}
+				},
+				"name": {
+					"description": "The name the user gave the service instance",
+					"type": "string",
+					"example": "Demo Service Name"
+				},
+				"dashboard_url": {
+					"description": "The url the card in the catalog will link to.",
+					"type": "string",
+					"example": "https://console.ng.bluemix.net"
+				}
+			},
+			"required": [
+				"name", "dashboard_url", "parameters"
+			]
+		},
+		"getVersion": {
+			"description": "Response structure for GET version",
+			"properties": {
+				"build": {
+					"type": "string",
+					"example": "5"
+				}
+			}
+		},
+		"getStatus": {
+			"description": "Response structure for GET status",
+			"properties": {
+				"status": {
+					"description": "The status for the Toolint Integration Broker itself, not including dependencies.",
+					"type": "string",
+					"example": "PASS"
+				},
+				"details": {
+					"description": "A description of the Toolint Integration Brokers status.",
+					"type": "string",
+					"example": "toolint-broker is OK"
+				},
+				"dependencies": {
+					"description": "A list of the Toolint Integration Brokers' dependencies status",
+					"type": "object",
+					"example": {
+						"CloudantDb": {
+							"type": "SERVICE",
+							"label": "CloudantDb",
+							"duration": 15,
+							"timestamp": "2017-02-03T15:43:25.874Z",
+							"status": "PASS",
+							"details": "cloudant database toolint-broker is running fine.",
+							"error_count": 0
+						}
+					}
+				}
+			}
+		},
+		"acceptEvent": {
+			"description": "Body structure for a notification. NOTE: Accepted formats change per service",
+			"properties": {
+				"name": {
+					"description": "The name of the message coming from an external service",
+					"type": "string",
+					"example": "otc-toolchain-demo"
+				},
+				"url": {
+					"description": "The url path of the events source",
+					"type": "string",
+					"example": "job/otc-toolchain-demo/"
+				},
+				"build": {
+					"description": "The build information for a Jenkins message",
+					"type": "object",
+					"example": {
+						"full_url": "http://jenkins/job/otc-toolchain-demo/20/",
+						"number": 20,
+						"queue_id": 27,
+						"phase": "COMPLETED",
+						"status": "SUCCESS",
+						"url": "job/otc-toolchain-demo/20/",
+						"scm": {},
+						"log": "",
+						"artifacts": {}
+					}
+				}
+			},
+			"required": [
+				"name", "url", "build"
+			]
+		},
+		"deleteMessagingAccept": {
+			"description": "Body structure for creating and deleting deployable mapping",
+			"properties": {
+				"Org": {
+					"description": "The Org that contains the deployable that will be updated",
+					"type": "object",
+					"example": {
+						"Guid": "1f39be76-186e-444d-8c64-86ca19e21510"
+					}
+				},
+				"Space": {
+					"description": "The Space that contains the deployable that will be updated",
+					"type": "object",
+					"example": {
+						"Guid": "1f39be76-186e-444d-8c64-86ca19e21510"
+					}
+				},
+				"App": {
+					"description": "The App that represents the deployable mapping",
+					"type": "object",
+					"example": {
+						"Guid": "5df02e1b-b78f-494f-9371-1c33394307a7"
+					}
+				},
+				"ApiEndpoint": {
+					"description": "The bluemix endpoint used to updated the deployable",
+					"type": "string",
+					"example": "https://api.ng.bluemix.net"
+				},
+				"tool_info": {
+					"description": "Information about the toolchain that builds the deployable",
+					"type": "object",
+					"example": {
+						"tid": "",
+						"sid": ""
+					}
+				}
+			}
+		},
+		"traceabilityMessaging": {
+			"description": "Body structure for traceability messages",
+			"properties": {
+				"event": {
+					"description": "The type of event the webhook manager is sending",
+					"type": "string",
+					"example": "notification"
+				},
+				"notification": {
+					"description": "Payload sent from the webhook manager",
+					"type": "object",
+					"example": {
+						"type": "deploy",
+						"service_instance_id": "",
+						"service_id": "",
+						"toolchain_guid": "",
+						"organization_guid": "",
+						"created_at": "",
+						"event_id": "",
+						"payload": {
+							"_id": "",
+							"deployable": {
+								"organization_guid": "",
+								"space_guid": "",
+								"region_id": "",
+								"deployable_guid": "",
+								"type": ""
+							},
+							"toolchain": {
+								"toolchain_guid": "",
+								"region_id": ""
+							},
+							"source": {
+								"source_guid": "",
+								"type": ""
+							},
+							"type": "",
+							"state": "",
+							"updated_at": "",
+							"experimental": {
+								"inputs": [{
+									"service_instance_id": "",
+									"data": {
+										"repo_url": "",
+										"repo_branch": "",
+										"timestamp": "",
+										"revision_url": ""
+									}
+								}],
+								"env": {
+									"label": "",
+									"region_name": "",
+									"org_name": "",
+									"space_name": ""
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
